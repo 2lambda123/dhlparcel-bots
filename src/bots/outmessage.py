@@ -35,9 +35,13 @@ from . import node
 from .botsconfig import *
 
 #avro
-import avro.schema as avroschema
-from avro.datafile import DataFileWriter
-from avro.io import DatumReader, DatumWriter
+# import avro.schema as avroschema
+# from avro.datafile import DataFileWriter
+# from avro.io import DatumReader, DatumWriter
+from fastavro import writer as avrowriter
+from fastavro.schema import load_schema
+
+import uuid
 
 def outmessage_init(**ta_info):
     ''' dispatch function class Outmessage or subclass
@@ -868,18 +872,17 @@ class avro(json):
 
     def _write(self, node_instance):
         ''' convert node tree to appropriate python object.
-            python objects are written to json by simplejson.
+            python objects are written to avro by fastavro.
         '''
-        avroobject = dict({node_instance.record['BOTSID']: self._node2json(node_instance)})
-        schema = avroschema.parse(botslib.readdata_bin('usersys/grammars/avro/' + self.ta_info['messagetype'] + '.avsc'))
-        writer = DataFileWriter(self._outstream, DatumWriter(), schema)
-        writer.append(avroobject)
-        writer.close()
+        avroobject = dict({node_instance.record['BOTSID']: self._node2avro(node_instance)})
+        schema = load_schema(botslib.abspathdata('usersys/grammars/avro/' + self.ta_info['messagetype'] + '.avsc'))
+        avrowriter(self._outstream, schema, [avroobject])
+        
 
-    def _node2json(self, node_instance):
+    def _node2avro(self, node_instance):
         ''' recursive method.
         '''
-        #newavroobject is the json object assembled in the function.
+        #newavroobject is the avro object assembled in the function.
         newavroobject = node_instance.record.copy()  # init newavroobject with record fields from node
         recordtag = newavroobject['BOTSID']
         for field_definition in self.defmessage.recorddefs[recordtag]:  # loop over fields in grammar
@@ -890,17 +893,38 @@ class avro(json):
                 newavroobject[field_definition[ID]] = self._convertField(value, field_definition)
         for childnode in node_instance.children:  # fill newjsonobject with the lex_records from childnodes.
             key = childnode.record['BOTSID']
-            if key in newjsonobject:
-                newavroobject[key].append(self._node2json(childnode))
+            union_record_name = childnode.record.get('AVRO_RECORD_NAME')
+            avro_array = childnode.record.get('AVRO_ARRAY')
+            avro_map = childnode.record.get('AVRO_MAP')
+            if key in newavroobject and avro_array:
+                newavroobject[key].append(childnode.record.get('input'))
+            elif key in newavroobject and avro_map:
+                newavroobject[key][childnode.record.get('key')] = childnode.record.get('value')
+            elif key in newavroobject:
+                newavroobject[key].append(self._node2avro(childnode))
+            elif union_record_name:
+                newavroobject[key] = (union_record_name, self._node2avro(childnode.children[0]))
+            elif avro_array:
+                newavroobject[key] = [childnode.record.get('input')]
+            elif avro_map:
+                newavroobject[key] = {childnode.record.get('key'): childnode.record.get('value')} 
             else:
-                newavroobject[key] = [self._node2json(childnode)]
+                newavroobject[key] = [self._node2avro(childnode)]
         del newavroobject['BOTSID']
         try:
             del newavroobject['BOTSIDnr']
         except:
             pass
+        try:
+            del newavroobject['AVRO_RECORD_NAME']
+        except:
+            pass
+        try:
+            del newavroobject['AVRO_ARRAY']
+        except:
+            pass
         return newavroobject
-
+    
     def _convertField(self, value, field_definition):
         if field_definition[BFORMAT] == 'N' and field_definition[DECIMALS] == 0:
             return int(value) 

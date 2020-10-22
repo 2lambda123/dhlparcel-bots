@@ -79,28 +79,58 @@ class OutmessageAvro(unittest.TestCase):
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
     # Avro complex types: record, enum, array, map, union, and fixed    
-    def testcompareavrowithjsoncomplex(self):
-        filein = 'botssys/infile/json/example3.json'
+    def testcompareavrowithavrocomplex(self):
+        filein = 'botssys/infile/avro/example3.avro'
         fileout = 'botssys/outfile/avro/example3.avro'
-        inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='example3')
-        out = outmessage.outmessage_init(editype='avro', messagetype='example3', filename=fileout, divtext='', topartner='')  # make outmessage object
-        pprint.pprint(inn1.root.display())
-        out.root = copy.deepcopy(inn1.root)
-        out.writeall()
-        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
+        utilsunit.readwrite(editype='avro', messagetype='example3', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='example3')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example3')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+
+    def testcompareavrowithavrounion(self):
+        filein = 'botssys/infile/avro/union.avro'
+        fileout = 'botssys/outfile/avro/union.avro'
+        utilsunit.readwrite(editype='avro', messagetype='union', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='union')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='union')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+
+    # TODO add support for array of complex types
+    def testcompareavrowithavroarray(self):
+        filein = 'botssys/infile/avro/array.avro'
+        fileout = 'botssys/outfile/avro/array.avro'
+        utilsunit.readwrite(editype='avro', messagetype='array', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='array')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='array')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+
+    def testcompareavrowithavromap(self):
+        filein = 'botssys/infile/avro/map.avro'
+        fileout = 'botssys/outfile/avro/map.avro'
+        utilsunit.readwrite(editype='avro', messagetype='map', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='map')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='map')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+
+    def testcompareavrowithavroenum(self):
+        filein = 'botssys/infile/avro/enum.avro'
+        fileout = 'botssys/outfile/avro/enum.avro'
+        utilsunit.readwrite(editype='avro', messagetype='enum', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='enum')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='enum')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
         # Avro up message
-    def testcompareavrowithjsonup(self):
-        filein = 'botssys/infile/json/up.json'
-        fileout = 'botssys/outfile/avro/up.avro'
-        inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='up')
-        out = outmessage.outmessage_init(editype='avro', messagetype='up', filename=fileout, divtext='', topartner='')  # make outmessage object
-        pprint.pprint(inn1.root.display())
-        out.root = copy.deepcopy(inn1.root)
-        out.writeall()
-        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
-        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+    # def testcompareavrowithjsonup(self):
+    #     filein = 'botssys/infile/json/up.json'
+    #     fileout = 'botssys/outfile/avro/up.avro'
+    #     inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='up')
+    #     out = outmessage.outmessage_init(editype='avro', messagetype='up', filename=fileout, divtext='', topartner='')  # make outmessage object
+    #     pprint.pprint(inn1.root.display())
+    #     out.root = copy.deepcopy(inn1.root)
+    #     out.writeall()
+    #     inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
+    #     self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
     
 def setup_module(module):
     botsinit.generalinit('config')

@@ -279,7 +279,7 @@ class Grammar(object):
                 raise botslib.GrammarError(_('Grammar "%(grammar)s", in recorddefs, record "%(record)s", field "%(field)s": minlength "%(len)s" has to be at least 0.'),
                                            {'grammar': self.grammarname, 'record': recordid, 'field': field[ID], 'len': field[LENGTH]})
             #format
-            if not isinstance(field[FORMAT], basestring):
+            if not isinstance(field[FORMAT], basestring) and not (isinstance(field[FORMAT], dict) and 'ENUM' in field[FORMAT]):
                 raise botslib.GrammarError(_('Grammar "%(grammar)s", in recorddefs, record "%(record)s", field "%(field)s": format "%(format)s" has to be a string.'),
                                            {'grammar': self.grammarname, 'record': recordid, 'field': field[ID], 'format': field[FORMAT]})
             self._manipulatefieldformat(field, recordid)
@@ -517,7 +517,10 @@ class Grammar(object):
 
     def _manipulatefieldformat(self, field, recordid):
         try:
-            field[BFORMAT] = self.formatconvert[field[FORMAT]]
+            if 'ENUM' in field[FORMAT]:
+                field[BFORMAT] = self.formatconvert['ENUM']
+            else:
+                field[BFORMAT] = self.formatconvert[field[FORMAT]]
         except KeyError:
             raise botslib.GrammarError(_('Grammar "%(grammar)s", record "%(record)s", field "%(field)s": format "%(format)s" has to be one of "%(keys)s".'),
                                        {'grammar': self.grammarname, 'record': recordid, 'field': field[ID], 'format': field[FORMAT], 'keys': self.formatconvert.keys()})
@@ -1091,7 +1094,8 @@ class avro(Grammar):
         #~ 'RL':'R',       #numerical, any number of decimals. fixed: no preceding zeros, left aligned
         #~ 'RR':'R',       #numerical, any number of decimals. fixed: preceding blancs, right aligned
         'I': 'I',  # numercial, implicit decimal
-        'B': 'A',
+        'B': 'B', # Boolean
+        'ENUM': 'ENUM'
         }
 
 

@@ -10,15 +10,9 @@
         "type": "record",
         "fields": [
           {
-            "name": "uuid",
-            "type": {
-              "type": "string",
-              "logicalType": "uuid"
-            }
-          },
-          {
             "name": "map",
             "type": {
+              "name": "MyMap",
               "type": "map",
               "values": "string"
             }

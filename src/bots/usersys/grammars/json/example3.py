@@ -8,6 +8,6 @@ recorddefs = {
     'HEA':[
             ['BOTSID','C',3, 'A'],
             ['uuid', 'M', 36, 'AN'],
-            ['map', 'M', 1, 'D']
+            ['map', 'M', 99, 'MAP']
           ]
      }
