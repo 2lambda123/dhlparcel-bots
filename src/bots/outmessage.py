@@ -910,19 +910,11 @@ class avro(json):
                 newavroobject[key] = {childnode.record.get('key'): childnode.record.get('value')} 
             else:
                 newavroobject[key] = [self._node2avro(childnode)]
-        del newavroobject['BOTSID']
-        try:
-            del newavroobject['BOTSIDnr']
-        except:
-            pass
-        try:
-            del newavroobject['AVRO_RECORD_NAME']
-        except:
-            pass
-        try:
-            del newavroobject['AVRO_ARRAY']
-        except:
-            pass
+        newavroobject.pop('BOTSID', None)
+        newavroobject.pop('BOTSIDnr', None)
+        newavroobject.pop('AVRO_RECORD_NAME', None)
+        newavroobject.pop('AVRO_ARRAY', None)
+        newavroobject.pop('AVRO_ARRAY', None)
         return newavroobject
     
     def _convertField(self, value, field_definition):

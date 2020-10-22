@@ -78,15 +78,6 @@ class OutmessageAvro(unittest.TestCase):
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
-    # Avro complex types: record, enum, array, map, union, and fixed    
-    def testcompareavrowithavrocomplex(self):
-        filein = 'botssys/infile/avro/example3.avro'
-        fileout = 'botssys/outfile/avro/example3.avro'
-        utilsunit.readwrite(editype='avro', messagetype='example3', filenamein=filein, filenameout=fileout)
-        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='example3')
-        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example3')
-        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
-
     def testcompareavrowithavrounion(self):
         filein = 'botssys/infile/avro/union.avro'
         fileout = 'botssys/outfile/avro/union.avro'
