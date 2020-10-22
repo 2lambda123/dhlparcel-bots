@@ -1077,6 +1077,7 @@ class avro(Grammar):
         'checkcollision': False,
         'lengthnumericbare': False,
         'stripfield_sep': False,
+        'noHeader': False
         }
 
     formatconvert = {

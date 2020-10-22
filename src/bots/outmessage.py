@@ -875,6 +875,8 @@ class avro(json):
             python objects are written to avro by fastavro.
         '''
         avroobject = dict({node_instance.record['BOTSID']: self._node2avro(node_instance)})
+        if (self.ta_info['noHeader']):
+            avroobject = avroobject[node_instance.record['BOTSID']]
         schema = load_schema(botslib.abspathdata('usersys/grammars/avro/' + self.ta_info['messagetype'] + '.avsc'))
         avrowriter(self._outstream, schema, [avroobject])
         

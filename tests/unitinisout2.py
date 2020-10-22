@@ -111,7 +111,15 @@ class OutmessageAvro(unittest.TestCase):
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='enum')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
-        # Avro up message
+    def testcompareavrowithavronoheader(self):
+        filein = 'botssys/infile/avro/noheader.avro'
+        fileout = 'botssys/outfile/avro/noheader.avro'
+        utilsunit.readwrite(editype='avro', messagetype='noheader', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='noheader')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='noheader')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+    
+    # Avro up message
     # def testcompareavrowithjsonup(self):
     #     filein = 'botssys/infile/json/up.json'
     #     fileout = 'botssys/outfile/avro/up.avro'
