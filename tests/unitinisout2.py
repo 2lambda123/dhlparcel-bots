@@ -26,27 +26,6 @@ import copy
 
 if sys.version_info[0] > 2:
     basestring = unicode = str
-    
-class OutmessageJson(unittest.TestCase):
-    #***********************************************************************
-    #***********compare json to json*******
-    #***********************************************************************
-
-    def testsymmetricalreadwrite(self):
-        filein = 'botssys/infile/edifactinvoic2json/json/3.json'
-        fileout = 'botssys/outfile/edifactinvoic2json/json/3.json'
-        utilsunit.readwrite(editype='json', messagetype='jsondemo_invoic', filenamein=filein, filenameout=fileout)
-        inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='jsondemo_invoic')
-        inn2 = inmessage.parse_edi_file(filename=fileout, editype='json', messagetype='jsondemo_invoic')
-        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
-        
-    def testsymmetricalreadwrite2(self):
-        filein = 'botssys/infile/json/shipments.json'
-        fileout = 'botssys/outfile/json/shipments.json'
-        utilsunit.readwrite(editype='json', messagetype='shipments', filenamein=filein, filenameout=fileout)
-        inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='shipments')
-        inn2 = inmessage.parse_edi_file(filename=fileout, editype='json', messagetype='shipments')
-        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
 class OutmessageAvro(unittest.TestCase):
     #***********************************************************************
