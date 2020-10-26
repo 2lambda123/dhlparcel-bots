@@ -39,20 +39,16 @@ class OutmessageJson(unittest.TestCase):
         inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='jsondemo_invoic')
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='json', messagetype='jsondemo_invoic')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
-
-class OutmessageAvro(unittest.TestCase):
-    #***********************************************************************
-    #***********compare avro to avro *******
-    #***********************************************************************
-
-    def testsymmetricalreadwrite(self):
-        filein = 'botssys/infile/avro/example.avro'
-        fileout = 'botssys/outfile/avro/example.avro'
-        utilsunit.readwrite(editype='avro', messagetype='example', filenamein=filein, filenameout=fileout)
-        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='example')
-        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example')
+        
+    def testsymmetricalreadwrite2(self):
+        filein = 'botssys/infile/json/shipments.json'
+        fileout = 'botssys/outfile/json/shipments.json'
+        utilsunit.readwrite(editype='json', messagetype='shipments', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='shipments')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='json', messagetype='shipments')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
+class OutmessageAvro(unittest.TestCase):
     #***********************************************************************
     #***********compare avro to json *******
     #***********************************************************************
@@ -78,6 +74,19 @@ class OutmessageAvro(unittest.TestCase):
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
+
+    #***********************************************************************
+    #***********compare avro to avro *******
+    #***********************************************************************
+
+    def testsymmetricalreadwrite(self):
+        filein = 'botssys/infile/avro/example.avro'
+        fileout = 'botssys/outfile/avro/example.avro'
+        utilsunit.readwrite(editype='avro', messagetype='example', filenamein=filein, filenameout=fileout)
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='example')
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
+
     def testcompareavrowithavrounion(self):
         filein = 'botssys/infile/avro/union.avro'
         fileout = 'botssys/outfile/avro/union.avro'
@@ -86,7 +95,6 @@ class OutmessageAvro(unittest.TestCase):
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='union')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
-    # TODO add support for array of complex types
     def testcompareavrowithavroarray(self):
         filein = 'botssys/infile/avro/array.avro'
         fileout = 'botssys/outfile/avro/array.avro'
@@ -118,19 +126,8 @@ class OutmessageAvro(unittest.TestCase):
         inn1 = inmessage.parse_edi_file(filename=filein, editype='avro', messagetype='noheader')
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='noheader')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
-    
-    # Avro up message
-    # def testcompareavrowithjsonup(self):
-    #     filein = 'botssys/infile/json/up.json'
-    #     fileout = 'botssys/outfile/avro/up.avro'
-    #     inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='up')
-    #     out = outmessage.outmessage_init(editype='avro', messagetype='up', filename=fileout, divtext='', topartner='')  # make outmessage object
-    #     pprint.pprint(inn1.root.display())
-    #     out.root = copy.deepcopy(inn1.root)
-    #     out.writeall()
-    #     inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
-    #     self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
-    
+
+
 def setup_module(module):
     botsinit.generalinit('config')
     botsglobal.logger = botsinit.initenginelogging('engine')

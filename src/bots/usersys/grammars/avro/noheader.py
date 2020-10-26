@@ -5,7 +5,7 @@ syntax = {
 }
 
 structure=    [
-  {ID:'HEA',MIN:1,MAX:1}
+  { ID:'HEA', MIN:1, MAX:1 }
 ]
     
 recorddefs = {

@@ -1096,7 +1096,8 @@ class avro(Grammar):
         #~ 'RR':'R',       #numerical, any number of decimals. fixed: preceding blancs, right aligned
         'I': 'I',  # numercial, implicit decimal
         'B': 'B', # Boolean
-        'ENUM': 'ENUM'
+        'ENUM': 'ENUM',
+        'UUID': 'UUID'
         }
 
 

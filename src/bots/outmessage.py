@@ -874,18 +874,18 @@ class avro(json):
         ''' convert node tree to appropriate python object.
             python objects are written to avro by fastavro.
         '''
-        avroobject = dict({node_instance.record['BOTSID']: self._node2avro(node_instance)})
+        avroobject = {node_instance.record['BOTSID']: self._node2avro(node_instance)}
         if (self.ta_info['noHeader']):
             avroobject = avroobject[node_instance.record['BOTSID']]
         schema = load_schema(botslib.abspathdata('usersys/grammars/avro/' + self.ta_info['messagetype'] + '.avsc'))
-        avrowriter(self._outstream, schema, [avroobject])
+        avrowriter(self._outstream, schema, [dict(avroobject)])
         
 
     def _node2avro(self, node_instance):
         ''' recursive method.
         '''
         #newavroobject is the avro object assembled in the function.
-        newavroobject = node_instance.record.copy()  # init newavroobject with record fields from node
+        newavroobject = dict(node_instance.record.copy())  # init newavroobject with record fields from node
         recordtag = newavroobject['BOTSID']
         for field_definition in self.defmessage.recorddefs[recordtag]:  # loop over fields in grammar
             value = newavroobject.get(field_definition[ID])
@@ -911,11 +911,14 @@ class avro(json):
             elif avro_map:
                 newavroobject[key] = {childnode.record.get('key'): childnode.record.get('value')} 
             else:
-                newavroobject[key] = [self._node2avro(childnode)]
+                # Heuristic to determine whether to put a childnode in an array or not
+                if (childnode.structure[MAX] == 1 and childnode.structure[MAX] == 1):
+                    newavroobject[key] = self._node2avro(childnode)
+                else:
+                    newavroobject[key] = [self._node2avro(childnode)]
         newavroobject.pop('BOTSID', None)
         newavroobject.pop('BOTSIDnr', None)
         newavroobject.pop('AVRO_RECORD_NAME', None)
-        newavroobject.pop('AVRO_ARRAY', None)
         newavroobject.pop('AVRO_ARRAY', None)
         return newavroobject
     
@@ -926,7 +929,8 @@ class avro(json):
             return float(value)
         if field_definition[FORMAT] == 'B':
             return value == 'True'
-        else: return value    
+        else: return value
+
 
 class templatehtml(Outmessage):
     ''' uses Genshi library for templating. Genshi is very similar to Kid, and is the fork/follow-up of Kid.

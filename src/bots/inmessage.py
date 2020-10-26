@@ -27,6 +27,7 @@ from collections import OrderedDict
 
 from fastavro import reader as avroReader
 from fastavro.schema import load_schema
+from uuid import UUID
 ''' Reading/lexing/parsing/splitting an edifile.'''
 
 
@@ -1764,8 +1765,8 @@ class avro(Inmessage):
                 continue
             elif isinstance(value, basestring):  # json field; map to field in node.record
                 ## for generating grammars: empty strings should generate a field
-                if value and not value.isspace():  # use only if string has a value.
-                    thisnode.record[key] = value
+                # if value and not value.isspace():  # use only if string has a value.
+                thisnode.record[key] = value
             elif isinstance(value, dict):
                 if (self._isavromap(key)):
                     thisnode.children.extend(self._doavromap(value, key))
@@ -1782,6 +1783,8 @@ class avro(Inmessage):
                 if newnode:
                     newnode.record['AVRO_RECORD_NAME'] = value[0]
                     thisnode.append(newnode)
+            elif isinstance(value, UUID):  # uuid of records will be serialized by fastavro as a UUID
+                thisnode.record[key] = unicode(value)
             else:
                 if self.ta_info['checkunknownentities']:
                     raise botslib.InMessageError(_('[J55]: Key "%(key)s" value "%(value)s": is not string, list or dict.'),
