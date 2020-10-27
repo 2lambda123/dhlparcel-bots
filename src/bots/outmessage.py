@@ -875,7 +875,7 @@ class avro(json):
         if (self.ta_info['noHeader']):
             avroobject = avroobject[node_instance.record['BOTSID']]
         schema = load_schema(botslib.abspathdata('usersys/grammars/avro/' + self.ta_info['messagetype'] + '.avsc'))
-        avrowriter(self._outstream, schema, [dict(avroobject)])
+        avrowriter(self._outstream, schema, [avroobject])
         
 
     def _node2avro(self, node_instance):
