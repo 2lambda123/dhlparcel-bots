@@ -24,7 +24,6 @@ from .botsconfig import *
 
 #avro
 from fastavro import reader as avroReader
-from fastavro.schema import load_schema
 
 ''' Reading/lexing/parsing/splitting an edifile.'''
 
