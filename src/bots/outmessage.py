@@ -35,9 +35,6 @@ from . import node
 from .botsconfig import *
 
 #avro
-# import avro.schema as avroschema
-# from avro.datafile import DataFileWriter
-# from avro.io import DatumReader, DatumWriter
 from fastavro import writer as avrowriter
 from fastavro.schema import load_schema
 
@@ -912,7 +909,7 @@ class avro(json):
                 newavroobject[key] = {childnode.record.get('key'): childnode.record.get('value')} 
             else:
                 # Heuristic to determine whether to put a childnode in an array or not
-                if (childnode.structure[MAX] == 1 and childnode.structure[MAX] == 1):
+                if (childnode.structure[MIN] == 1 and childnode.structure[MAX] == 1):
                     newavroobject[key] = self._node2avro(childnode)
                 else:
                     newavroobject[key] = [self._node2avro(childnode)]
