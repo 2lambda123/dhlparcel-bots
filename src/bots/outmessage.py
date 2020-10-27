@@ -336,6 +336,10 @@ class Outmessage(message.Message):
                 if lenght < field_definition[MINLENGTH]:
                     self.add2errorlist(_('[F34]: Record "%(record)s" time field "%(field)s" too small (min %(min)s): "%(content)s".\n') %
                                        {'record': self.mpathformat(structure_record[MPATH]), 'field': field_definition[ID], 'content': value, 'min': field_definition[MINLENGTH]})
+        elif field_definition[BFORMAT] == 'ENUM':
+            if(value not in field_definition[FORMAT]['ENUM']):
+                self.add2errorlist(_('[F35]%(linpos)s: Record "%(record)s" enum field "%(field)s" not a valid enum: "%(content)s".\n') %
+                                       {'linpos': node_instance.linpos(), 'record': self.mpathformat(structure_record[MPATH]), 'field': field_definition[ID], 'content': value})
         else:  # numerics
             #~ if value[0] == '-':
                 #~ minussign = '-'
