@@ -21,13 +21,11 @@ from . import message
 from . import node
 from . import grammar
 from .botsconfig import *
-from avro.datafile import DataFileReader
-from avro.io import DatumReader
-from collections import OrderedDict
 
+#avro
 from fastavro import reader as avroReader
 from fastavro.schema import load_schema
-from uuid import UUID
+
 ''' Reading/lexing/parsing/splitting an edifile.'''
 
 
@@ -1731,25 +1729,25 @@ class avro(Inmessage):
         self.messagegrammarread(typeofgrammarfile='grammars')
         self._readcontent_edifile()
 
-        jsonobject = self.rawinput
-        if isinstance(jsonobject, list):
+        avroobject = self.rawinput
+        if isinstance(avroobject, list):
             self.root = node.Node()  # initialise empty node.
-            self.root.children = self._dojsonlist(jsonobject, self._getrootid())  # fill root with children
+            self.root.children = self._dojsonlist(avroobject, self._getrootid())  # fill root with children
             for child in self.root.children:
                 if not child.record:  # sanity test: the children must have content
                     raise botslib.InMessageError(_('[J51]: No usable content.'))
                 self.checkmessage(child, self.defmessage)
                 self.ta_info.update(child.queries)
-        elif isinstance(jsonobject, dict):
-            if len(jsonobject) == 1 and isinstance(list(jsonobject.values())[0], dict):
+        elif isinstance(avroobject, dict):
+            if len(avroobject) == 1 and isinstance(list(avroobject.values())[0], dict):
                 # best structure: {rootid:{id2:<dict, list>}}
-                self.root = self._dojsonobject(list(jsonobject.values())[0], list(jsonobject.keys())[0])
-            elif len(jsonobject) == 1 and isinstance(list(jsonobject.values())[0], list):
+                self.root = self._doavroobject(list(avroobject.values())[0], list(avroobject.keys())[0])
+            elif len(avroobject) == 1 and isinstance(list(avroobject.values())[0], list):
                 #root dict has no name; use value from grammar for rootID; {id2:<dict, list>}
                 self.root = node.Node(record={'BOTSID': self._getrootid()})  # initialise empty node.
-                self.root.children = self._dojsonlist(list(jsonobject.values())[0], list(jsonobject.keys())[0])
+                self.root.children = self._dojsonlist(list(avroobject.values())[0], list(avroobject.keys())[0])
             else:
-                self.root = self._dojsonobject(jsonobject, self._getrootid())
+                self.root = self._doavroobject(avroobject, self._getrootid())
             if not self.root:
                 raise botslib.InMessageError(_('[J52]: No usable content.'))
             self.checkmessage(self.root, self.defmessage)
@@ -1758,32 +1756,30 @@ class avro(Inmessage):
             #root in JSON is neither dict or list.
             raise botslib.InMessageError(_('[J53]: Content must be a "list" or "object".'))
 
-    def _dojsonobject(self, jsonobject, name):
+    def _doavroobject(self, avrooobject, name):
         thisnode = node.Node(record={'BOTSID': name})  # initialise empty node.
-        for key, value in jsonobject.items():
+        for key, value in avrooobject.items():
             if value is None:
                 continue
-            elif isinstance(value, basestring):  # json field; map to field in node.record
-                ## for generating grammars: empty strings should generate a field
-                # if value and not value.isspace():  # use only if string has a value.
+            elif isinstance(value, basestring):  # avro field; map to field in node.record
                 thisnode.record[key] = value
             elif isinstance(value, dict):
                 if (self._isavromap(key)):
                     thisnode.children.extend(self._doavromap(value, key))
                 else:
-                    newnode = self._dojsonobject(value, key)
+                    newnode = self._doavroobject(value, key)
                     if newnode:
                         thisnode.append(newnode)
             elif isinstance(value, list):
-                thisnode.children.extend(self._dojsonlist(value, key))
-            elif isinstance(value, (int, long, float)):  # json field; map to field in node.record
+                thisnode.children.extend(self._doavrolist(value, key))
+            elif isinstance(value, (int, long, float)):  # avro field; map to field in node.record
                 thisnode.record[key] = unicode(value)
             elif isinstance(value, tuple):  # unions of records will be serialized by fastavro as a tuple with record name and value
-                newnode = self._dojsonobject({value[0]: value[1]}, key)
+                newnode = self._doavroobject({value[0]: value[1]}, key)
                 if newnode:
                     newnode.record['AVRO_RECORD_NAME'] = value[0]
                     thisnode.append(newnode)
-            elif isinstance(value, UUID):  # uuid of records will be serialized by fastavro as a UUID
+            elif isinstance(value, UUID):  # uuid will be serialized by fastavro as a UUID
                 thisnode.record[key] = unicode(value)
             else:
                 if self.ta_info['checkunknownentities']:
@@ -1792,7 +1788,6 @@ class avro(Inmessage):
                 thisnode.record[key] = unicode(value)
         if len(thisnode.record) == 2 and not thisnode.children:
             return None  # node is empty...
-        #~ thisnode.record['BOTSID']=name
         return thisnode
 
     def _getrootid(self):
@@ -1805,36 +1800,36 @@ class avro(Inmessage):
                 exists = True
         return exists
 
-    def _dojsonlist(self, jsonobject, name):
-        lijst = []  # initialise empty list, used to append a listof (converted) json objects
-        for i in jsonobject:
+    def _doavrolist(self, avroobject, name):
+        lijst = []  # initialise empty list, used to append a listof (converted) avro objects
+        for i in avroobject:
             if isinstance(i, dict):  # check list item is dict/object
-                newnode = self._dojsonobject(i, name)
+                newnode = self._doavroobject(i, name)
                 if newnode:
                     lijst.append(newnode)
             elif isinstance(i, list):  # check list item is list:
-                newnode = self._dojsonlist(i, name)
+                newnode = self._doavrolist(i, name)
                 if newnode:
                     lijst.append(newnode)
             else:
-                newnode = self._dojsonobject({'input': i, 'AVRO_ARRAY': 'True'}, name)
+                newnode = self._doavroobject({'input': i, 'AVRO_ARRAY': 'True'}, name)
                 if newnode:
                     lijst.append(newnode)
         return lijst
 
-    def _doavromap(self, jsonobject, name):
+    def _doavromap(self, avroobject, name):
         lijst = []
-        for key, value in jsonobject.items():
+        for key, value in avroobject.items():
             if value is None:
                 continue
-            elif isinstance(value, basestring):  # json field; map to field in node.record
+            elif isinstance(value, basestring):  # avro field; map to field in node.record
                 ## for generating grammars: empty strings should generate a field
-                if value and not value.isspace():  # use only if string has a value.
-                    newnode = self._dojsonobject({'key': key, 'value': value, 'AVRO_MAP': 'True'}, name)
+                if value:  # use only if string has a value.
+                    newnode = self._doavroobject({'key': key, 'value': value, 'AVRO_MAP': 'True'}, name)
                     if newnode:
                         lijst.append(newnode)
-            elif isinstance(value, (int, long, float)):  # json field; map to field in node.record
-                newnode = self._dojsonobject({'key': key, 'value': value, 'AVRO_MAP': 'True'}, name)
+            elif isinstance(value, (int, long, float)):  # avro field; map to field in node.record
+                newnode = self._doavroobject({'key': key, 'value': value, 'AVRO_MAP': 'True'}, name)
                 if newnode:
                     lijst.append(newnode)
             else:
@@ -1845,7 +1840,6 @@ class avro(Inmessage):
         ''' read content of edi file to memory.
         '''
         botsglobal.logger.debug('Read edi file "%(filename)s".', self.ta_info)
-        # schema = load_schema(botslib.abspathdata('usersys/grammars/avro/' + self.ta_info['messagetype'] + '.avsc'))
         with botslib.opendata_bin(self.ta_info['filename'], "rb") as fo:
             reader = avroReader(fo, return_record_name=True)
             self.rawinput = next(reader)
