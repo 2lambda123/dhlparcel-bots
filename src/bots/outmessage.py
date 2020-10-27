@@ -37,8 +37,7 @@ from .botsconfig import *
 #avro
 from fastavro import writer as avrowriter
 from fastavro.schema import load_schema
-
-import uuid
+from uuid import UUID
 
 def outmessage_init(**ta_info):
     ''' dispatch function class Outmessage or subclass
@@ -925,6 +924,8 @@ class avro(json):
             return int(value) 
         if field_definition[BFORMAT] == 'R':
             return float(value)
+        if field_definition[BFORMAT] == 'UUID':
+            return UUID(value)
         if field_definition[FORMAT] == 'B':
             return value == 'True'
         else: return value

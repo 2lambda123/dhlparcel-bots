@@ -53,6 +53,16 @@ class OutmessageAvro(unittest.TestCase):
         inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example2')
         self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
+    # Avro logical types: uuid
+    def testcompareavrowithjsonlogical(self):
+        filein = 'botssys/infile/json/example3.json'
+        fileout = 'botssys/outfile/avro/example3.avro'
+        inn1 = inmessage.parse_edi_file(filename=filein, editype='json', messagetype='example3')
+        out = outmessage.outmessage_init(editype='avro', messagetype='example3', filename=fileout, divtext='', topartner='')  # make outmessage object
+        out.root = copy.deepcopy(inn1.root)
+        out.writeall()
+        inn2 = inmessage.parse_edi_file(filename=fileout, editype='avro', messagetype='example3')
+        self.assertTrue(utilsunit.comparenode(inn1.root, inn2.root))
 
     #***********************************************************************
     #***********compare avro to avro *******

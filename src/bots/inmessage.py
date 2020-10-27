@@ -24,6 +24,7 @@ from .botsconfig import *
 
 #avro
 from fastavro import reader as avroReader
+from uuid import UUID
 
 ''' Reading/lexing/parsing/splitting an edifile.'''
 
