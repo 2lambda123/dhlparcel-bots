@@ -1727,7 +1727,7 @@ class avro(Inmessage):
 
     def initfromfile(self):
         self.messagegrammarread(typeofgrammarfile='grammars')
-        self._readcontent_edifile()
+        self._readcontent_avrofile()
 
         avroobject = self.rawinput
         if isinstance(avroobject, list):
@@ -1836,10 +1836,10 @@ class avro(Inmessage):
                 raise botslib.InMessageError(_('[J54]: Avromap values only supports primitive types'))
         return lijst
 
-    def _readcontent_edifile(self):
-        ''' read content of edi file to memory.
+    def _readcontent_avrofile(self):
+        ''' read content of avro file to memory.
         '''
-        botsglobal.logger.debug('Read edi file "%(filename)s".', self.ta_info)
+        botsglobal.logger.debug('Read avro file "%(filename)s".', self.ta_info)
         with botslib.opendata_bin(self.ta_info['filename'], "rb") as fo:
             reader = avroReader(fo, return_record_name=True)
             self.rawinput = next(reader)
