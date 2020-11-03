@@ -27,7 +27,6 @@ def startmulti(grammardir):
     process_name = 'grammarcheck'
     botsglobal.logger = botsinit.initenginelogging(process_name)
     atexit.register(logging.shutdown)
-    print('go')
     files = glob.iglob(grammardir, recursive=True)
     files = [f for f in files if os.path.isfile(f)]
     for filename in files:
