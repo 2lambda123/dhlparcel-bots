@@ -1783,8 +1783,8 @@ class avro(Inmessage):
                     thisnode.append(newnode)
             elif isinstance(value, UUID):  # uuid will be serialized by fastavro as a UUID
                 thisnode.record[key] = unicode(value)
-            elif isinstance(value, datetime):  # uuid will be serialized by fastavro as a UUID
-                thisnode.record[key] = unicode(value)
+            elif isinstance(value, datetime):  # timestamp will be serialized by fastavro as a datetime
+                thisnode.record[key] = unicode(value.timestamp())
             else:
                 if self.ta_info['checkunknownentities']:
                     raise botslib.InMessageError(_('[J55]: Key "%(key)s" value "%(value)s": is not string, list or dict.'),
