@@ -1738,7 +1738,7 @@ class avro(Inmessage):
         avroobject = self.rawinput
         if isinstance(avroobject, list):
             self.root = node.Node()  # initialise empty node.
-            self.root.children = self._dojsonlist(avroobject, self._getrootid())  # fill root with children
+            self.root.children = self._doavrolist(avroobject, self._getrootid())  # fill root with children
             for child in self.root.children:
                 if not child.record:  # sanity test: the children must have content
                     raise botslib.InMessageError(_('[J51]: No usable content.'))
@@ -1751,7 +1751,7 @@ class avro(Inmessage):
             elif len(avroobject) == 1 and isinstance(list(avroobject.values())[0], list):
                 #root dict has no name; use value from grammar for rootID; {id2:<dict, list>}
                 self.root = node.Node(record={'BOTSID': self._getrootid()})  # initialise empty node.
-                self.root.children = self._dojsonlist(list(avroobject.values())[0], list(avroobject.keys())[0])
+                self.root.children = self._doavrolist(list(avroobject.values())[0], list(avroobject.keys())[0])
             else:
                 self.root = self._doavroobject(avroobject, self._getrootid())
             if not self.root:
@@ -1856,11 +1856,17 @@ class avro(Inmessage):
         ''' read content of avro file to memory.
         '''
         botsglobal.logger.debug('Read avro file "%(filename)s".', self.ta_info)
-        _, schemapath = botslib.botsimport('grammars', self.ta_info['editype'], self.ta_info['messagetype'])
-        schema = load_schema(schemapath + '.avsc')
         with botslib.opendata_bin(self.ta_info['filename'], "rb") as fo:
-            fo.seek(5) # drop first 5 bytes
-            self.rawinput = schemaless_reader(fo, writer_schema = schema, return_record_name=True)
+            fo.seek(1)
+            writerSchemaId = int.from_bytes(fo.read(4), byteorder='big')
+            # TODO add integration with schema registry
+            writerSchemaPath = botslib.join(botsglobal.ini.get('directories', 'usersysabs'), 'grammars', self.ta_info['editype'], str(writerSchemaId) + '.avsc')
+            writerSchema = load_schema(writerSchemaPath)
+            
+            readerSchemapath = botslib.join(botsglobal.ini.get('directories', 'usersysabs'),'grammars', self.ta_info['editype'], self.ta_info['messagetype'] + '.avsc')
+            readerSchema = load_schema(readerSchemapath)
+            
+            self.rawinput = schemaless_reader(fo, writer_schema = writerSchema, reader_schema = readerSchema, return_record_name=True)
 
 
 class db(Inmessage):
