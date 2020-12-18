@@ -1860,7 +1860,7 @@ class avro(Inmessage):
             fo.seek(1)
             writerSchemaId = int.from_bytes(fo.read(4), byteorder='big')
             # TODO add integration with schema registry
-            writerSchemaPath = botslib.join(botsglobal.ini.get('directories', 'usersysabs'), 'grammars', self.ta_info['editype'], str(writerSchemaId) + '.avsc')
+            writerSchemaPath = botslib.join(botsglobal.ini.get('directories', 'usersysabs'), 'grammars', self.ta_info['editype'], 'schema-registry', botsglobal.ini.get('settings', 'schemaregistrydirectory'), str(writerSchemaId) + '.avsc')
             writerSchema = load_schema(writerSchemaPath)
             
             readerSchemapath = botslib.join(botsglobal.ini.get('directories', 'usersysabs'),'grammars', self.ta_info['editype'], self.ta_info['messagetype'] + '.avsc')
