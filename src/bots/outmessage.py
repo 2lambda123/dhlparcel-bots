@@ -873,7 +873,7 @@ class jsonnocheck(json):
         del newjsonobject['BOTSIDnr']
         return newjsonobject
 
-class avro():
+class avro(Outmessage):
 
     def _write(self, node_instance):
         ''' convert node tree to appropriate python object.
