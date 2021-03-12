@@ -1790,7 +1790,7 @@ class avro(Inmessage):
             elif isinstance(value, datetime):  # timestamp will be serialized by fastavro as a datetime
                 thisnode.record[key] = unicode(value.timestamp())
             elif isinstance(value, date):
-                seconds_since_epoch = datetime(value.year,date.month, date.day, 0, 0, 0, tzinfo=timezone.utc).timestamp() / 86400
+                seconds_since_epoch = datetime(value.year, value.month, value.day, 0, 0, 0, tzinfo=timezone.utc).timestamp() / 86400
                 thisnode.record[key] = unicode(seconds_since_epoch)
             else:
                 if self.ta_info['checkunknownentities']:
