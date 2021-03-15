@@ -26,7 +26,7 @@ from .botsconfig import *
 from fastavro import schemaless_reader, reader as avroReader
 from fastavro.schema import load_schema
 from uuid import UUID
-from datetime import datetime, date, timezone
+import datetime as dt
 
 ''' Reading/lexing/parsing/splitting an edifile.'''
 
@@ -1787,11 +1787,14 @@ class avro(Inmessage):
                     thisnode.append(newnode)
             elif isinstance(value, UUID):  # uuid will be serialized by fastavro as a UUID
                 thisnode.record[key] = unicode(value)
-            elif isinstance(value, datetime):  # timestamp will be serialized by fastavro as a datetime
+            elif isinstance(value, dt.datetime):  # timestamp will be serialized by fastavro as a datetime
                 thisnode.record[key] = unicode(value.timestamp())
-            elif isinstance(value, date):
-                seconds_since_epoch = datetime(value.year, value.month, value.day, 0, 0, 0, tzinfo=timezone.utc).timestamp() / 86400
+            elif isinstance(value, dt.date):
+                seconds_since_epoch = dt.datetime(value.year, value.month, value.day, 0, 0, 0, tzinfo=dt.timezone.utc).timestamp() / 86400
                 thisnode.record[key] = unicode(seconds_since_epoch)
+            elif isinstance(value, dt.time):
+                seconds_since_midnight = dt.timedelta(hours=value.hour, minutes=value.minute, seconds=value.second).total_seconds()
+                thisnode.record[key] = unicode(seconds_since_midnight)
             else:
                 if self.ta_info['checkunknownentities']:
                     raise botslib.InMessageError(_('[J55]: Key "%(key)s" value "%(value)s": is not string, list or dict.'),
