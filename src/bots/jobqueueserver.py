@@ -35,8 +35,8 @@ class Jobqueue(object):
     def addjob(self, task, priority):
         """
 
-        :param task: 
-        :param priority: 
+        :param task:
+        :param priority:
 
         """
         # canonize task (to better find duplicates)??. Is dangerous, as non-bots-tasks might be started....
@@ -94,10 +94,10 @@ class Jobqueue(object):
 def maxruntimeerror(logger, maxruntime, jobnumber, task_to_run):
     """
 
-    :param logger: 
-    :param maxruntime: 
-    :param jobnumber: 
-    :param task_to_run: 
+    :param logger:
+    :param maxruntime:
+    :param jobnumber:
+    :param task_to_run:
 
     """
     logger.error(
@@ -117,10 +117,10 @@ def maxruntimeerror(logger, maxruntime, jobnumber, task_to_run):
 def launcher(logger, port, lauchfrequency, maxruntime):
     """
 
-    :param logger: 
-    :param port: 
-    :param lauchfrequency: 
-    :param maxruntime: 
+    :param logger:
+    :param port:
+    :param lauchfrequency:
+    :param maxruntime:
 
     """
     xmlrpcclient = xmlrpclib.ServerProxy("http://localhost:" + str(port))
@@ -175,14 +175,14 @@ def start():
     # ***command line arguments**************************
     usage = """
     This is "%(name)s" version %(version)s, part of Bots open source edi translator (http://bots.sourceforge.net).
-    Server program that ensures only a single bots-engine runs at any time, and no engine run requests are 
-    lost/discarded. Each request goes to a queue and is run in sequence when the previous run completes. 
+    Server program that ensures only a single bots-engine runs at any time, and no engine run requests are
+    lost/discarded. Each request goes to a queue and is run in sequence when the previous run completes.
     Use of the job queue is optional and must be configured in bots.ini (jobqueue section, enabled = True).
     Usage:
         %(name)s  -c<directory>
     Options:
         -c<directory>   directory for configuration files (default: config).
-        
+
     """ % {
         "name": os.path.basename(sys.argv[0]),
         "version": botsglobal.version,
