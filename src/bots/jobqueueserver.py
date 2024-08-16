@@ -21,6 +21,8 @@ TASK = 2
 class Jobqueue(object):
     """handles the jobqueue.
     methodes can be called over xmlrpc (except the methods starting with '_')
+
+
     """
 
     def __init__(self, logger):
@@ -31,6 +33,12 @@ class Jobqueue(object):
         self.logger = logger
 
     def addjob(self, task, priority):
+        """
+
+        :param task: 
+        :param priority: 
+
+        """
         # canonize task (to better find duplicates)??. Is dangerous, as non-bots-tasks might be started....
         # first check if job already in queue
         for job in self.jobqueue:
@@ -59,16 +67,19 @@ class Jobqueue(object):
         return 0
 
     def clearjobq(self):
+        """ """
         self.jobqueue = []
         self.logger.info("Job queue cleared.")
         return 0
 
     def getjob(self):
+        """ """
         if len(self.jobqueue):
             return self.jobqueue.pop()
         return 0
 
     def _sort(self):
+        """ """
         self.jobqueue.sort(reverse=True)
         self.logger.debug(
             "Job queue changed. New queue: %(queue)s",
@@ -81,6 +92,14 @@ class Jobqueue(object):
 
 
 def maxruntimeerror(logger, maxruntime, jobnumber, task_to_run):
+    """
+
+    :param logger: 
+    :param maxruntime: 
+    :param jobnumber: 
+    :param task_to_run: 
+
+    """
     logger.error(
         "Job %(job)s exceeded maxruntime of %(maxruntime)s minutes",
         {"job": jobnumber, "maxruntime": maxruntime},
@@ -96,6 +115,14 @@ def maxruntimeerror(logger, maxruntime, jobnumber, task_to_run):
 
 
 def launcher(logger, port, lauchfrequency, maxruntime):
+    """
+
+    :param logger: 
+    :param port: 
+    :param lauchfrequency: 
+    :param maxruntime: 
+
+    """
     xmlrpcclient = xmlrpclib.ServerProxy("http://localhost:" + str(port))
     maxseconds = maxruntime * 60
     time.sleep(3)  # to allow jobqserver to start
@@ -143,6 +170,7 @@ def launcher(logger, port, lauchfrequency, maxruntime):
 
 
 def start():
+    """ """
     # NOTE: bots directory should always be on PYTHONPATH - otherwise it will not start.
     # ***command line arguments**************************
     usage = """
