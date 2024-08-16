@@ -47,21 +47,27 @@ class Jobqueue(object):
                     job[PRIORITY] = priority
                     self.logger.info(
                         "Duplicate job, changed priority to %(priority)s: %(task)s",
-                        {"priority": priority, "task": task},
+                        {
+                            "priority": priority,
+                            "task": task
+                        },
                     )
                     self._sort()
                     return 0  # zero or other code??
                 else:
-                    self.logger.info(
-                        "Duplicate job not added: %(task)s", {"task": task}
-                    )
+                    self.logger.info("Duplicate job not added: %(task)s",
+                                     {"task": task})
                     return 4
         # add the job
         self.jobcounter += 1
         self.jobqueue.append([priority, self.jobcounter, task])
         self.logger.info(
             "Added job %(job)s, priority %(priority)s: %(task)s",
-            {"job": self.jobcounter, "priority": priority, "task": task},
+            {
+                "job": self.jobcounter,
+                "priority": priority,
+                "task": task
+            },
         )
         self._sort()
         return 0
@@ -83,7 +89,10 @@ class Jobqueue(object):
         self.jobqueue.sort(reverse=True)
         self.logger.debug(
             "Job queue changed. New queue: %(queue)s",
-            {"queue": "".join(["\n    " + repr(job) for job in self.jobqueue])},
+            {
+                "queue": "".join(
+                    ["\n    " + repr(job) for job in self.jobqueue])
+            },
         )
         # ~ print self.jobqueue
 
@@ -102,12 +111,19 @@ def maxruntimeerror(logger, maxruntime, jobnumber, task_to_run):
     """
     logger.error(
         "Job %(job)s exceeded maxruntime of %(maxruntime)s minutes",
-        {"job": jobnumber, "maxruntime": maxruntime},
+        {
+            "job": jobnumber,
+            "maxruntime": maxruntime
+        },
     )
     botslib.sendbotserrorreport(
         "[Bots Job Queue] - Job exceeded maximum runtime",
         "Job %(job)s exceeded maxruntime of %(maxruntime)s minutes:\n %(task)s"
-        % {"job": jobnumber, "maxruntime": maxruntime, "task": task_to_run},
+        % {
+            "job": jobnumber,
+            "maxruntime": maxruntime,
+            "task": task_to_run
+        },
     )
 
 
@@ -150,21 +166,30 @@ def launcher(logger, port, lauchfrequency, maxruntime):
                     stderr=open(os.devnull, "w"),
                 )
                 time_taken = datetime.timedelta(
-                    seconds=(datetime.datetime.now() - starttime).seconds
-                )
+                    seconds=(datetime.datetime.now() - starttime).seconds)
                 logger.info(
                     "Finished job %(job)s, elapsed time %(time_taken)s, result %(result)s",
-                    {"job": jobnumber, "time_taken": time_taken, "result": result},
+                    {
+                        "job": jobnumber,
+                        "time_taken": time_taken,
+                        "result": result
+                    },
                 )
             except Exception as msg:
                 logger.error(
                     "Error starting job %(job)s: %(msg)s",
-                    {"job": jobnumber, "msg": msg},
+                    {
+                        "job": jobnumber,
+                        "msg": msg
+                    },
                 )
                 botslib.sendbotserrorreport(
                     "[Bots Job Queue] - Error starting job",
-                    "Error starting job %(job)s:\n %(task)s\n\n %(msg)s"
-                    % {"job": jobnumber, "task": task_to_run, "msg": msg},
+                    "Error starting job %(job)s:\n %(task)s\n\n %(msg)s" % {
+                        "job": jobnumber,
+                        "task": task_to_run,
+                        "msg": msg
+                    },
                 )
             timer_thread.cancel()
 
@@ -201,16 +226,15 @@ def start():
             sys.exit(0)
     # ***end handling command line arguments**************************
     botsinit.generalinit(
-        configdir
-    )  # find locating of bots, configfiles, init paths etc.
+        configdir)  # find locating of bots, configfiles, init paths etc.
     if not botsglobal.ini.getboolean("jobqueue", "enabled", False):
-        print(
-            "Error: bots jobqueue cannot start; not enabled in %s/bots.ini" % configdir
-        )
+        print("Error: bots jobqueue cannot start; not enabled in %s/bots.ini" %
+              configdir)
         sys.exit(1)
     process_name = "jobqueue"
     logger = botsinit.initserverlogging(process_name)
-    logger.log(25, "Bots %(process_name)s started.", {"process_name": process_name})
+    logger.log(25, "Bots %(process_name)s started.",
+               {"process_name": process_name})
     logger.log(
         25,
         'Bots %(process_name)s configdir: "%(configdir)s".',
@@ -223,7 +247,10 @@ def start():
     logger.log(
         25,
         'Bots %(process_name)s listens for xmlrpc at port: "%(port)s".',
-        {"process_name": process_name, "port": port},
+        {
+            "process_name": process_name,
+            "port": port
+        },
     )
 
     # start launcher thread
