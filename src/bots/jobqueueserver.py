@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-import sys
+import datetime
 import os
+import subprocess
+import sys
+import threading
+import time
 import xmlrpc.client as xmlrpclib
 from xmlrpc.server import SimpleXMLRPCServer
-import time
-import datetime
-import subprocess
-import threading
+
+import bots.botsglobal as botsglobal
 import bots.botsinit as botsinit
 import bots.botslib as botslib
-import bots.botsglobal as botsglobal
-
 
 # -------------------------------------------------------------------------------
 PRIORITY = 0
